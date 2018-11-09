@@ -21,7 +21,7 @@ module SecondLevelCache
             hitted_ids = records_from_cache.map{|key, _| key.split("/")[2].to_i}
             missed_ids = ids.map{|x| x.to_i} - hitted_ids
 
-            ::SecondLevelCache::Config.logger.info "second_level_cache preload #{self.name} missed ids -> #{missed_ids.inspect} | hitted ids -> #{hitted_ids.inspect}"
+            ::SecondLevelCache::Config.logger.info "second_level_cache preload #{self.klass.name} missed ids -> #{missed_ids.inspect} | hitted ids -> #{hitted_ids.inspect}"
 
             if missed_ids.empty?
               RecordMarshal.load_multi(records_from_cache.values)
