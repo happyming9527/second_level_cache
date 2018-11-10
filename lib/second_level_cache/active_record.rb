@@ -20,5 +20,4 @@ else
   ActiveRecord::Associations::BelongsToAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::BelongsToAssociation)
   ActiveRecord::Associations::HasOneAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::HasOneAssociation)
   ActiveRecord::Associations::Preloader::BelongsTo.send(:include, SecondLevelCache::ActiveRecord::Associations::Preloader::BelongsTo)
-  ActiveRecord::Associations::Preloader::HasOne.send(:include, SecondLevelCache::ActiveRecord::Associations::Preloader::HasOne)
 end

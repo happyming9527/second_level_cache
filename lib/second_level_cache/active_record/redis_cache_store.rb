@@ -1,9 +1,23 @@
 module RedisCacheStore
   module_function
+
+  def is_integer_string?(value)
+    value.is_a?(String) && (value.to_i.to_s == value)
+  end
+
+  def clear
+    SecondLevelCache::Config.redis_connect.flushdb
+  end
+
+  def delete(key)
+    SecondLevelCache::Config.redis_connect.del(key)
+  end
+
   def read(key)
     value = SecondLevelCache::Config.redis_connect.get(key)
     if value.present?
-      value = JSON.parse(value)
+      value = JSON.parse(value) rescue value
+      value = value.to_i if self.is_integer_string?(value)
     end
     value
   end
@@ -43,7 +57,8 @@ module RedisCacheStore
     keys.each_with_index do |key, index|
       value = values[index]
       next if value.blank?
-      value = JSON.parse(values[index])
+      value = JSON.parse(value) rescue value
+      value = value.to_i if self.is_integer_string?(value)
       hash[key] = value
     end
     hash

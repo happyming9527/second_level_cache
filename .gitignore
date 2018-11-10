@@ -14,3 +14,7 @@
 *~
 *.lock
 vendor/bundle
+.idea
+.byebug_history
+.ruby-version
+.DS_Store

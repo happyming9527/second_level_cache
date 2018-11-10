@@ -3,11 +3,13 @@ require 'test_helper'
 
 class PreloaderTest < ActiveSupport::TestCase
   def test_belongs_to_preload_caches_includes
+    Topic.create(title: 'title0', body: 'body0')
     topics = [
       Topic.create(title: 'title1', body: 'body1'),
       Topic.create(title: 'title2', body: 'body2'),
       Topic.create(title: 'title3', body: 'body3')
     ]
+    Topic.create(title: 'title4', body: 'body4')
     topics.each { |topic| topic.posts.create(body: "post#{topic.id}") }
 
     results = nil

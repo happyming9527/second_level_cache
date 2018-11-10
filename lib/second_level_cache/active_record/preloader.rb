@@ -40,44 +40,6 @@ module SecondLevelCache
             record.write_second_level_cache
           end
         end
-
-        module HasOne
-          extend ActiveSupport::Concern
-
-          included do
-            alias_method_chain :records_for, :second_level_cache
-          end
-
-          def records_for_with_second_level_cache(ids)
-            return records_for_without_second_level_cache(ids) unless klass.second_level_cache_enabled?
-
-            map_cache_keys = ids.map{|id| klass.second_level_cache_key(id)}
-            records_from_cache = ::SecondLevelCache.cache_store.read_multi(*map_cache_keys)
-            # NOTICE
-            # Rails.cache.read_multi return hash that has keys only hitted.
-            # eg. Rails.cache.read_multi(1,2,3) => {2 => hit_value, 3 => hit_value}
-            hitted_ids = records_from_cache.map{|key, _| key.split("/")[2].to_i}
-            missed_ids = ids.map{|x| x.to_i} - hitted_ids
-
-            ::SecondLevelCache::Config.logger.info "second_level_cache preload #{self.klass.name} missed ids -> #{missed_ids.inspect} | hitted ids -> #{hitted_ids.inspect}"
-
-            if missed_ids.empty?
-              RecordMarshal.load_multi(records_from_cache.values)
-            else
-              records_from_db = records_for_without_second_level_cache(missed_ids)
-              keys = records_from_db.map(&:second_level_cache_key)
-              values = records_from_db.map {|i| RecordMarshal.dump(i) }
-              SecondLevelCache.cache_store.write_multi(keys, values, :expires_in => self.klass.second_level_cache_options[:expires_in])
-              records_from_db + RecordMarshal.load_multi(records_from_cache.values)
-            end
-          end
-
-          private
-
-          def write_cache(record)
-            record.write_second_level_cache
-          end
-        end
       end
     end
   end

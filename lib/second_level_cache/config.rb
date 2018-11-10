@@ -3,10 +3,10 @@ module SecondLevelCache
   module Config
     extend self
 
-    attr_accessor :cache_store, :logger, :cache_key_prefix, :redis_connect
+    attr_accessor :logger, :cache_key_prefix, :redis_connect
 
     def cache_store
-      @cache_store ||= RedisCacheStore
+      RedisCacheStore
     end
 
     def logger
