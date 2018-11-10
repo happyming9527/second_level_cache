@@ -27,7 +27,10 @@ module SecondLevelCache
               RecordMarshal.load_multi(records_from_cache.values)
             else
               records_from_db = records_for_without_second_level_cache(missed_ids)
-              records_from_db.map{|record| write_cache(record); record} + RecordMarshal.load_multi(records_from_cache.values)
+              keys = records_from_db.map(&:second_level_cache_key)
+              values = records_from_db.map {|i| RecordMarshal.dump(i) }
+              SecondLevelCache.cache_store.write_multi(keys, values, :expires_in => self.klass.second_level_cache_options[:expires_in])
+              records_from_db + RecordMarshal.load_multi(records_from_cache.values)
             end
           end
 
@@ -62,7 +65,10 @@ module SecondLevelCache
               RecordMarshal.load_multi(records_from_cache.values)
             else
               records_from_db = records_for_without_second_level_cache(missed_ids)
-              records_from_db.map{|record| write_cache(record); record} + RecordMarshal.load_multi(records_from_cache.values)
+              keys = records_from_db.map(&:second_level_cache_key)
+              values = records_from_db.map {|i| RecordMarshal.dump(i) }
+              SecondLevelCache.cache_store.write_multi(keys, values, :expires_in => self.klass.second_level_cache_options[:expires_in])
+              records_from_db + RecordMarshal.load_multi(records_from_cache.values)
             end
           end
 

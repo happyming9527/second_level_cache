@@ -7,6 +7,7 @@ require 'second_level_cache/active_record/persistence'
 require 'second_level_cache/active_record/belongs_to_association'
 require 'second_level_cache/active_record/has_one_association'
 require 'second_level_cache/active_record/preloader'
+require 'second_level_cache/active_record/redis_cache_store'
 
 if defined? Rails
   require 'second_level_cache/active_record/railtie'
@@ -19,4 +20,5 @@ else
   ActiveRecord::Associations::BelongsToAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::BelongsToAssociation)
   ActiveRecord::Associations::HasOneAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::HasOneAssociation)
   ActiveRecord::Associations::Preloader::BelongsTo.send(:include, SecondLevelCache::ActiveRecord::Associations::Preloader::BelongsTo)
+  ActiveRecord::Associations::Preloader::HasOne.send(:include, SecondLevelCache::ActiveRecord::Associations::Preloader::HasOne)
 end
