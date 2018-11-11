@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
   if ::ActiveRecord::VERSION::STRING >= '4.1.0'
     serialize :json_options, JSON
   end
-  acts_as_cached(:version => CacheVersion, :expires_in => 3.day)
+  acts_as_cached(:version => CacheVersion, :expires_in => 3.day, unique_key_column_names: [[:name]])
   has_one  :account
   has_one  :forked_user_link, foreign_key: 'forked_to_user_id'
   has_one  :forked_from_user, through: :forked_user_link
@@ -36,6 +36,7 @@ class User < ActiveRecord::Base
   has_one  :namespace, -> { where(kind: nil) }
   has_many :books
   has_many :images, :as => :imagable
+  has_one :image, :as => :imagable
 end
 
 class Namespace < ActiveRecord::Base

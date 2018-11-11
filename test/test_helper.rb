@@ -11,7 +11,6 @@ ActiveRecord::Base.raise_in_transactional_callbacks = true if ActiveRecord::Base
 ActiveSupport.test_order = :sorted if ActiveSupport.respond_to?(:test_order=)
 
 require 'second_level_cache'
-
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 
 require 'model/user'
@@ -39,6 +38,7 @@ class ActiveSupport::TestCase
   end
 
   teardown do
+    SecondLevelCache.cache_store.clear
     DatabaseCleaner.clean
   end
 end

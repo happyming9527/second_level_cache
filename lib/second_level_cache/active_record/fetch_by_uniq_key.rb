@@ -3,6 +3,10 @@ module SecondLevelCache
   module ActiveRecord
     module FetchByUniqKey
       def fetch_by_uniq_keys(where_values)
+        insect_keys = (where_values.keys.map(&:to_s) - flatten_unique_key_column_names)
+        if insect_keys.present?
+          raise "#{self.name} fetch_by_uniq_keys used not setted cache columns：#{insect_keys.to_s}"
+        end
         cache_key = cache_uniq_key(where_values)
         if _id = SecondLevelCache.cache_store.read(cache_key)
           self.find(_id) rescue nil
@@ -26,14 +30,18 @@ module SecondLevelCache
         fetch_by_uniq_key(value, uniq_key_name) || raise(::ActiveRecord::RecordNotFound)
       end
 
+      def get_second_level_cache_unique_key(where_values)
+        cache_uniq_key(where_values)
+      end
+
       private
-      
+
       def cache_uniq_key(where_values)
         ext_key = where_values.collect { |k,v|
           v = Digest::MD5.hexdigest(v) if v && v.size >= 32
           [k,v].join("_")
-        }.join(",")
-        "uniq_key_#{self.name}_#{ext_key}"
+        }.sort.join(",")
+        "slc_uniq_key_#{self.name}_#{ext_key}"
       end
     end
   end

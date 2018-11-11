@@ -6,7 +6,9 @@ module SecondLevelCache
 
       included do
         after_commit :expire_second_level_cache, :on => :destroy
+        after_commit :destroy_unique_key_cache, :on => :destroy
         after_commit :update_second_level_cache, :on => :update
+        after_commit :expire_unique_key_cache, :on => :update
         after_commit :write_second_level_cache, :on => :create
 
         class << self

@@ -6,6 +6,6 @@ ActiveRecord::Base.connection.create_table(:posts, :force => true) do |t|
 end
 
 class Post < ActiveRecord::Base
-  acts_as_cached
+  acts_as_cached unique_key_column_names: [[:topic_id, :slug]]
   belongs_to :topic, :touch => true
 end

@@ -23,12 +23,26 @@ module SecondLevelCache
         @second_level_cache_options = options
         @second_level_cache_options[:expires_in] ||= 1.week
         @second_level_cache_options[:version] ||= 0
+        @second_level_cache_options[:unique_key_column_names] ||= []
+        @second_level_cache_options[:unique_key_column_names] = @second_level_cache_options[:unique_key_column_names].map{|i| i.map(&:to_s)}
         relation.class.send :include, SecondLevelCache::ActiveRecord::FinderMethods
         include SecondLevelCache::ActiveRecord::Core if /^4\.2\./.match(::ActiveRecord.version.version)
       end
 
       def second_level_cache_enabled?
         !!@second_level_cache_enabled
+      end
+
+      def set_second_level_cache_unique_key(*column_arrays)
+        @second_level_cache_options[:unique_key_column_names]= column_arrays.map{|i| i.map(&:to_s)}
+      end
+
+      def flatten_unique_key_column_names
+        @second_level_cache_options[:unique_key_column_names].flatten
+      end
+
+      def unique_key_column_names
+        @second_level_cache_options[:unique_key_column_names]
       end
 
       def without_second_level_cache
@@ -70,6 +84,33 @@ module SecondLevelCache
 
     def second_level_cache_key
       self.class.second_level_cache_key(id)
+    end
+
+    def destroy_unique_key_cache
+      self.class.unique_key_column_names.each do |i|
+        hash = {}
+        i.each do |key|
+          hash[key] = self[key]
+        end
+        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash) if hash.present?
+      end
+    end
+
+    def expire_unique_key_cache
+      changed_keys = previous_changes.keys
+      self.class.unique_key_column_names.each do |i|
+        insect_keys = (i & changed_keys)
+        next unless insect_keys.present?
+        hash = {}
+        i.each do |key|
+          if insect_keys.include?(key)
+            hash[key] = previous_changes[key][0]
+          else
+            hash[key] = self[key]
+          end
+        end
+        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash) if hash.present?
+      end
     end
 
     def expire_second_level_cache
