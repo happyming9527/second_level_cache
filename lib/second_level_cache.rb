@@ -38,11 +38,11 @@ module SecondLevelCache
       end
 
       def flatten_unique_key_column_names
-        @second_level_cache_options[:unique_key_column_names].flatten
+        @second_level_cache_options ? @second_level_cache_options[:unique_key_column_names].flatten : []
       end
 
       def unique_key_column_names
-        @second_level_cache_options[:unique_key_column_names]
+        @second_level_cache_options ? @second_level_cache_options[:unique_key_column_names] : []
       end
 
       def without_second_level_cache

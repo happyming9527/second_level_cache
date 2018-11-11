@@ -22,6 +22,19 @@ ActiveRecord::Base.connection.create_table(:namespaces, :force => true) do |t|
   t.timestamps null: false
 end
 
+ActiveRecord::Base.connection.create_table(:big_posts, :force => true) do |t|
+  t.integer :user_id
+  t.text  :content
+  t.timestamps null: false
+end
+
+ActiveRecord::Base.connection.create_table(:big_comments, :force => true) do |t|
+  t.integer :user_id
+  t.integer :big_post_id
+  t.text  :content
+  t.timestamps null: false
+end
+
 class User < ActiveRecord::Base
   CacheVersion = 3
   serialize :options, Array
@@ -33,6 +46,8 @@ class User < ActiveRecord::Base
   has_one  :forked_user_link, foreign_key: 'forked_to_user_id'
   has_one  :forked_from_user, through: :forked_user_link
   has_many :namespaces
+  has_many :big_posts
+  has_many :big_comments
   has_one  :namespace, -> { where(kind: nil) }
   has_many :books
   has_many :images, :as => :imagable
@@ -48,4 +63,14 @@ end
 class ForkedUserLink < ActiveRecord::Base
   belongs_to :forked_from_user, class_name: User
   belongs_to :forked_to_user, class_name: User
+end
+
+class BigPost < ActiveRecord::Base
+  belongs_to :user
+  has_one :big_comment
+end
+
+class BigComment < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :big_post
 end

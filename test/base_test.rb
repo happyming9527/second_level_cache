@@ -116,4 +116,17 @@ class BaseTest < ActiveSupport::TestCase
     user = User.find(@user.id)
     assert_equal 1, user.books_count
   end
+
+  def test_common_model_create_or_update_or_destroy_should_ok
+    assert_nothing_raised do
+      puts 'hello'
+      big_post = @user.big_posts.create(content: 'hello,world')
+      big_post_1 = @user.big_posts.create(content: 'test')
+      comment = @user.big_comments.create(content: 'test', big_post: big_post)
+      big_post = BigPost.find big_post.id
+      big_comment = big_post.big_comment
+      big_comment.update(big_post_id: big_post_1.id)
+      big_comment.destroy
+    end
+  end
 end
