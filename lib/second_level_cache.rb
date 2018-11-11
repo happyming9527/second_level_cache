@@ -92,7 +92,7 @@ module SecondLevelCache
         i.each do |key|
           hash[key] = self[key]
         end
-        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash) if hash.present?
+        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash)
       end
     end
 
@@ -109,7 +109,7 @@ module SecondLevelCache
             hash[key] = self[key]
           end
         end
-        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash) if hash.present?
+        SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash)
       end
     end
 

@@ -13,6 +13,16 @@ module SecondLevelCache
       end
 
       def update_columns_with_second_level_cache(**attributes)
+        keys = attributes.keys.map(&:to_s)
+        self.class.unique_key_column_names.each do |cache_key_array|
+          if (keys & cache_key_array).present?
+            hash = {}
+            cache_key_array.each do |key|
+              hash[key] = self[key]
+            end
+            SecondLevelCache.cache_store.delete self.class.get_second_level_cache_unique_key(hash)
+          end
+        end
         update_columns_without_second_level_cache(**attributes).tap{update_second_level_cache}
       end
 

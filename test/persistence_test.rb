@@ -27,7 +27,21 @@ class PersistenceTest < ActiveSupport::TestCase
   end
 
   def test_should_update_cache_after_update_column
+    User.fetch_by_uniq_keys(name: @user.name)
+    key = User.get_second_level_cache_unique_key(name: @user.name)
+    assert SecondLevelCache::Config.redis_connect.exists(key)
     @user.update_column :name, "new_name"
+    assert_not SecondLevelCache::Config.redis_connect.exists(key)
+    new_user = User.find @user.id
+    assert_equal new_user, @user
+  end
+
+  def test_should_update_cache_after_update_columns
+    User.fetch_by_uniq_keys(name: @user.name)
+    key = User.get_second_level_cache_unique_key(name: @user.name)
+    assert SecondLevelCache::Config.redis_connect.exists(key)
+    @user.update_columns :name => "new_name"
+    assert_not SecondLevelCache::Config.redis_connect.exists(key)
     new_user = User.find @user.id
     assert_equal new_user, @user
   end
