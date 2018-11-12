@@ -6,7 +6,7 @@ class SecondLevelCache::ActiveRecord::Railtie < Rails::Railtie
 
     ActiveRecord::Base.send(:include, SecondLevelCache::ActiveRecord::Persistence)
     ActiveRecord::Associations::BelongsToAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::BelongsToAssociation)
-    ActiveRecord::Associations::HasOneAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::HasOneAssociation)
+    # ActiveRecord::Associations::HasOneAssociation.send(:include, SecondLevelCache::ActiveRecord::Associations::HasOneAssociation)
     ActiveRecord::Associations::Preloader::BelongsTo.send(:include, SecondLevelCache::ActiveRecord::Associations::Preloader::BelongsTo)
   end
 end
